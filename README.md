@@ -16,7 +16,7 @@ map2json可以将复杂map转化为可供jsonDecode正常转换的String字符�
 
 * 1，convert map to string 将map转化为string
 ```${dart}
-final jsonstr =lexTool.stringify({
+final jsonstr =LexTool.stringify({
         "arr":[
           1
         ],
