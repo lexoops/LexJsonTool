@@ -38,7 +38,7 @@ class LexTool{
           final valueStr =EasyCode.stringify(value.map((key, value) => MapEntry("$key", value)));
           result +='"$key":$valueStr${index >0?",":""}';
         }
-        if(value is List){
+        else if(value is List){
           //转化arr的对象
           final List<dynamic> list =[];
           for(dynamic item in value){
