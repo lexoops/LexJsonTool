@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class EasyCode{
+class LexTool{
   static String getStringSafeSub(String str, int length, {String putStr ="..."}){
     if (str==""){
       return "";
