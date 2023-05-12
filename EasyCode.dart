@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class LexTool{
+class LexJsonTool{
   static String getStringSafeSub(String str, int length, {String putStr ="..."}){
     if (str==""){
       return "";
@@ -28,14 +28,29 @@ class LexTool{
   }
 
   /*
-  * summary Map2JsonString-that can be Decode with jsonDecode or json.decode .*/
-  static String stringify(Map<String, dynamic> hash){
+  * summary Map2JsonString-that can be Decode with jsonDecode or json.decode .
+  * 如果在map中存在字符型json，那么请在convertJsonStr2Map中传入false。如果要将其转化为map存储，传入true
+  * */
+  static String stringify(Map<String, dynamic> hash,{bool convertJsonStr2Map =false}){
     try{
       String result ="";
       int index =hash.length;
       hash.map((key, value){
+        //如果遇到被字符化的json map，那么打上tag
+        bool isStringMap =false;
+        if(value is String &&value.contains("{")){
+          try{
+            //确认是string型map
+            isStringMap =json.decode(value) !=null;
+          }catch(e){}
+        }
+        //匹配类型
+        if(isStringMap){
+          //将其作为map存储
+          value =convertJsonStr2Map?json.decode(value):value.toString().replaceAll("\"", "");
+        }
         if(value is Map){
-          final valueStr =EasyCode.stringify(value.map((key, value) => MapEntry("$key", value)));
+          final valueStr =LexJsonTool.stringify(value.map((key, value) => MapEntry("$key", value)));
           result +='"$key":$valueStr${index >0?",":""}';
         }
         else if(value is List){
@@ -43,11 +58,11 @@ class LexTool{
           final List<dynamic> list =[];
           for(dynamic item in value){
             if(item is Map){
-              final valueStr =EasyCode.stringify(item.map((key, value) => MapEntry("$key", value)));
+              final valueStr =LexJsonTool.stringify(item.map((key, value) => MapEntry("$key", value)));
               list.add(valueStr);
             }
             //如果是个原型
-            else if(EasyCode.needPrototype(item)){
+            else if(LexJsonTool.needPrototype(item)){
               list.add(item);
             }
             //转化为string
@@ -58,7 +73,7 @@ class LexTool{
           result +='"$key":$list,';
         }
         else{
-          final dynamic prototypeOrStr =EasyCode.needPrototype(value)?value:'\"$value"';
+          final dynamic prototypeOrStr =LexJsonTool.needPrototype(value)?value:'\"$value"';
           result +='"$key":$prototypeOrStr,';
         }
         index -=1;
@@ -73,7 +88,6 @@ class LexTool{
       return "";
     }
   }
-
 
   Map<String, String> toJson(String str){
     return json.decode(str);
